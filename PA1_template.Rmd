@@ -11,19 +11,18 @@ output:
 
 ```{r message=FALSE}
 library(tidyverse)
-library(pander)
 
 data <- read_csv("activity.csv")
 
 str(data)
-pander(head(data))
+head(data)
 ```
 
 ## What is mean total number of steps taken per day?
 
 1. Calculate the total number of steps taken per day
 
-```{r Calculate Steps, message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE}
 ## Calculating total number of steps per day
 grouped_data_sum <- data %>%
   group_by(date) %>%
@@ -32,7 +31,7 @@ grouped_data_sum <- data %>%
 
 2. Make a histogram of the total number of steps taken each day
 
-```{r Histogram of total number of steps taken each day}
+```{r}
 
 hdata <- ggplot(grouped_data_sum, aes(x = sumsteps)) +
   geom_histogram(binwidth = 2000,color = "black ",fill = "lightblue") + 
@@ -45,14 +44,14 @@ print(hdata)
 3. Calculate and report the mean and median of the total number of steps taken per day
 
 ```{r}
-pander(tibble(Mean = mean(grouped_data_sum$sumsteps), Median = median(grouped_data_sum$sumsteps)))
+tibble(Mean = mean(grouped_data_sum$sumsteps), Median = median(grouped_data_sum$sumsteps))
 ```
 
 ## What is the average daily activity pattern?
 
 1. Make a time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 
-```{r Time series of average steps taken across all days, message=FALSE}
+```{r message=FALSE}
 grouped_data_interval <- data %>%
     group_by(interval) %>%
     summarise(stepsmean = mean(steps, na.rm = TRUE))
@@ -69,7 +68,7 @@ print(tplot)
 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
 ```{r}
-pander(filter(grouped_data_interval, stepsmean == max(stepsmean)))
+filter(grouped_data_interval, stepsmean == max(stepsmean))
 ```
 
 
@@ -85,24 +84,31 @@ sum(is.na(data))
 
 3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
 
+Create a new data set, still with no changes
 ``` {r}
 data2 <- data
+```
 
+Create a data set that contains no NA values
+```{r}
 dataNoNA <- data[!is.na(data$steps),]
+```
 
+Subset `data2` for values that are NA, and those values change them for the mean of the steps by interval of time. 
+```{r}
 data2$steps[is.na(data2$steps)] <- tapply(dataNoNA$steps, dataNoNA$interval, mean)
 
 str(data2)
 ```
-Does `data2` contain NA values? 
 
+Does `data2` contain NA values? 
 ``` {r}
 any(is.na(data2))
 ```
 
 4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
-```{r Historgram of total nomber of steps oer day after imputing NA, message=FALSE}
+```{r message=FALSE}
 total_steps_2 <- data2 %>%
     group_by(date) %>%
     summarise(sumsteps = sum(steps))
@@ -112,7 +118,7 @@ ggplot(total_steps_2, aes(x = sumsteps)) +
     labs(title = "Total number of steps per day") + 
     xlab("Total steps")
 
-pander(tibble(Mean = mean(total_steps_2$sumsteps), Median = median(total_steps_2$sumsteps)))
+tibble(Mean = mean(total_steps_2$sumsteps), Median = median(total_steps_2$sumsteps))
 ```
 
 Yes, the values differ from the first part of the assignment. The impact of imputing missing data for the total daily nymber of steps is that the mean becomes equal to the median. 
@@ -133,7 +139,7 @@ unique(data2$days)
 
 2. Make a panel plot containing a time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
 
-```{r Time series of the average steps by time interval on weekdays and weekends, message=FALSE}
+```{r message=FALSE}
 dayssubset <- data2 %>%
     group_by(interval, days) %>%
     summarise(stepsmean = mean(steps))

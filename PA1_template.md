@@ -12,7 +12,6 @@ output:
 
 ```r
 library(tidyverse)
-library(pander)
 
 data <- read_csv("activity.csv")
 
@@ -33,25 +32,20 @@ str(data)
 ```
 
 ```r
-pander(head(data))
+head(data)
 ```
 
-
--------------------------------
- steps      date      interval 
-------- ------------ ----------
-  NA     2012-10-01      0     
-
-  NA     2012-10-01      5     
-
-  NA     2012-10-01      10    
-
-  NA     2012-10-01      15    
-
-  NA     2012-10-01      20    
-
-  NA     2012-10-01      25    
--------------------------------
+```
+## # A tibble: 6 x 3
+##   steps date       interval
+##   <dbl> <date>        <dbl>
+## 1    NA 2012-10-01        0
+## 2    NA 2012-10-01        5
+## 3    NA 2012-10-01       10
+## 4    NA 2012-10-01       15
+## 5    NA 2012-10-01       20
+## 6    NA 2012-10-01       25
+```
 
 ## What is mean total number of steps taken per day?
 
@@ -77,21 +71,21 @@ hdata <- ggplot(grouped_data_sum, aes(x = sumsteps)) +
 print(hdata)
 ```
 
-![](PA1_template_files/figure-html/Histogram of total number of steps taken each day-1.png)<!-- -->
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
 
 3. Calculate and report the mean and median of the total number of steps taken per day
 
 
 ```r
-pander(tibble(Mean = mean(grouped_data_sum$sumsteps), Median = median(grouped_data_sum$sumsteps)))
+tibble(Mean = mean(grouped_data_sum$sumsteps), Median = median(grouped_data_sum$sumsteps))
 ```
 
-
----------------
- Mean   Median 
------- --------
- 9354   10395  
----------------
+```
+## # A tibble: 1 x 2
+##    Mean Median
+##   <dbl>  <dbl>
+## 1 9354.  10395
+```
 
 ## What is the average daily activity pattern?
 
@@ -112,21 +106,21 @@ tplot <- ggplot(grouped_data_interval, aes(x = interval, y = stepsmean)) +
 print(tplot)
 ```
 
-![](PA1_template_files/figure-html/Time series of average steps taken across all days-1.png)<!-- -->
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
 
 ```r
-pander(filter(grouped_data_interval, stepsmean == max(stepsmean)))
+filter(grouped_data_interval, stepsmean == max(stepsmean))
 ```
 
-
-----------------------
- interval   stepsmean 
----------- -----------
-   835        206.2   
-----------------------
+```
+## # A tibble: 1 x 2
+##   interval stepsmean
+##      <dbl>     <dbl>
+## 1      835      206.
+```
 
 
 ## Imputing missing values
@@ -146,12 +140,21 @@ sum(is.na(data))
 
 3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
 
+Create a new data set, still with no changes
 
 ```r
 data2 <- data
+```
 
+Create a data set that contains no NA values
+
+```r
 dataNoNA <- data[!is.na(data$steps),]
+```
 
+Subset `data2` for values that are NA, and those values change them for the mean of the steps by interval of time. 
+
+```r
 data2$steps[is.na(data2$steps)] <- tapply(dataNoNA$steps, dataNoNA$interval, mean)
 
 str(data2)
@@ -169,8 +172,8 @@ str(data2)
 ##   ..   interval = col_double()
 ##   .. )
 ```
-Does `data2` contain NA values? 
 
+Does `data2` contain NA values? 
 
 ```r
 any(is.na(data2))
@@ -194,18 +197,18 @@ ggplot(total_steps_2, aes(x = sumsteps)) +
     xlab("Total steps")
 ```
 
-![](PA1_template_files/figure-html/Historgram of total nomber of steps oer day after imputing NA-1.png)<!-- -->
+![](PA1_template_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
 
 ```r
-pander(tibble(Mean = mean(total_steps_2$sumsteps), Median = median(total_steps_2$sumsteps)))
+tibble(Mean = mean(total_steps_2$sumsteps), Median = median(total_steps_2$sumsteps))
 ```
 
-
-----------------
- Mean    Median 
-------- --------
- 10766   10766  
-----------------
+```
+## # A tibble: 1 x 2
+##     Mean Median
+##    <dbl>  <dbl>
+## 1 10766. 10766.
+```
 
 Yes, the values differ from the first part of the assignment. The impact of imputing missing data for the total daily nymber of steps is that the mean becomes equal to the median. 
 
@@ -245,4 +248,4 @@ ggplot(dayssubset, aes(x = interval, y = stepsmean , color = days)) +
   labs(title = "Average steps by time interval on weekdays and weekends")
 ```
 
-![](PA1_template_files/figure-html/Time series of the average steps by time interval on weekdays and weekends-1.png)<!-- -->
+![](PA1_template_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
